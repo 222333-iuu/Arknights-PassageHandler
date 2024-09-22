@@ -203,6 +203,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="read_me.cpp" />
     <ClCompile Include="剧情处理.cpp" />
     <ClCompile Include="剧情处理Dlg.cpp" />
   </ItemGroup>

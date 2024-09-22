@@ -211,6 +211,7 @@
     <ResourceCompile Include="My.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="data\check.ini" />
     <None Include="res\My.rc2" />
   </ItemGroup>
   <ItemGroup>

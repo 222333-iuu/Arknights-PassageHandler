@@ -60,6 +60,7 @@ C剧情处理Dlg::C剧情处理Dlg(CWnd* pParent /*=nullptr*/)
 	, m_url(_T(""))
 	, m_adddescription(_T(""))
 	, m_text(_T(""))
+	, linenum(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -78,6 +79,7 @@ void C剧情处理Dlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO6, m_res_file);
 	DDX_Control(pDX, IDC_RADIO5, m_res_web);
 	DDX_Control(pDX, IDC_TEXT, m_intro);
+	DDX_Text(pDX, IDC_LINENUM, linenum);
 }
 
 BEGIN_MESSAGE_MAP(C剧情处理Dlg, CDialogEx)
@@ -93,6 +95,7 @@ BEGIN_MESSAGE_MAP(C剧情处理Dlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON4, &C剧情处理Dlg::OnBnClickedButton4)
 	ON_BN_CLICKED(IDC_BUTTON5, &C剧情处理Dlg::OnBnClickedButton5)
 	ON_EN_CHANGE(IDC_EDIT3, &C剧情处理Dlg::OnEnChangeEdit3)
+	ON_STN_CLICKED(IDC_LINENUM, &C剧情处理Dlg::OnStnClickedLinenum)
 END_MESSAGE_MAP()
 
 
@@ -409,6 +412,8 @@ void C剧情处理Dlg::OnBnClickedButton5()
 	m_intro.ShowWindow(true);
 	m_url = TEXT("");
 	m_adddescription = TEXT("");
+	linenum = TEXT("字数:0");
+	m_text = TEXT("");
 	UpdateData(false);
 }
 
@@ -440,9 +445,9 @@ void C剧情处理Dlg::OnDropFiles(HDROP hDropInfo)
 			wideString[len] = L'\0'; // 确保以null结尾  
 
 			// 在编辑控件中显示内容  
-			m_text = wideString.data();
+			m_text = m_text + TEXT("\n\n") + strFilePath + TEXT("\n") + wideString.data();
+			linenum.Format(_T("字数:%d"), m_text.GetLength());
 			UpdateData(false);
-
 			file.Close();
 		}
 
@@ -450,7 +455,7 @@ void C剧情处理Dlg::OnDropFiles(HDROP hDropInfo)
 		m_res_file.EnableWindow(true);
 		m_res_web.SetCheck(false);
 		m_res_file.SetCheck(true);
-		m_intro.ShowWindow(false);
+		m_intro.ShowWindow(true);
 	}
 
 	DragFinish(hDropInfo);
@@ -466,4 +471,10 @@ void C剧情处理Dlg::OnEnChangeEdit3()
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
 	// TODO:  在此添加控件通知处理程序代码
+}
+
+
+void C剧情处理Dlg::OnStnClickedLinenum()
+{
+	// TODO: 在此添加控件通知处理程序代码
 }

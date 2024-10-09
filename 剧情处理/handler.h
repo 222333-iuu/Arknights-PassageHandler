@@ -25,7 +25,9 @@ class HANDLEER {
 	CString dealSubt(CString tar);
 	CString dealStic(CString tar);
 	CString dealmult(CString tar);
+	CString dealAnim(CString tar);
 	CString FindAndCut(CString tar, CString lt, CString rt = TEXT(""));
+	void writefile();
 public:
 	HANDLEER(CString &target);
 	CString afterhand;

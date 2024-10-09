@@ -63,4 +63,6 @@ public:
 	CButton m_res_web;
 	afx_msg void OnEnChangeEdit3();
 	CStatic m_intro;
+	afx_msg void OnStnClickedLinenum();
+	CString linenum;
 };

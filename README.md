@@ -27,7 +27,7 @@
 如果wiki上尚未更新剧情，你也可以通过剧情解包的方式获得在网页上右键选中的代码，将对应的txt文件拖入右侧空白，再点击“获取文本”即可  
 
 ### 什么，你问怎么解包？
-请自行下载软件 <mark>assetstudiogui</mark>， 并在 <mark>Android/data/com.hypergryph.arknights/files/AB/Android/gamedata/story</mark> 中获取对应的.ab文件解包 (目前此地址已经失效，需要另找地址！） 
+请自行下载软件 <mark>assetstudiogui</mark>， 并在 <mark>Android/data/com.hypergryph.arknights/files/AB/Android/gamedata/story</mark> 中获取对应的.ab文件解包  
 
 ## 5.其他说明
 最后，该程序运行时需要使用文件 <mark>./data/check.ini</mark>, 请确保你在移动可执行文件时一同转移，  

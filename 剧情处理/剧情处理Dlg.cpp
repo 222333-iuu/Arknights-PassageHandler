@@ -12,7 +12,9 @@
 #include <atlbase.h>
 #include <atlconv.h>
 #include <vector>
+#include <wininet.h>
 
+#pragma comment(lib, "wininet.lib")
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -80,6 +82,7 @@ void C剧情处理Dlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO5, m_res_web);
 	DDX_Control(pDX, IDC_TEXT, m_intro);
 	DDX_Text(pDX, IDC_LINENUM, linenum);
+	DDX_Control(pDX, IDC_CHECK2, m_issource);
 }
 
 BEGIN_MESSAGE_MAP(C剧情处理Dlg, CDialogEx)
@@ -215,7 +218,10 @@ void C剧情处理Dlg::OnBnClickedButton1()
 	rurl = TEXT("https://prts.wiki/index.php?title=");
 	rurl += url;
 	rurl += TEXT("&action=edit");
-	m_webbrowser.Navigate(rurl, &noArg, &noArg, &noArg, &noArg);
+	if(!m_issource.GetCheck()) m_webbrowser.Navigate(rurl, &noArg, &noArg, &noArg, &noArg);
+	else {
+		GetSourceCode(rurl);
+	}
 }
 
 void C剧情处理Dlg::OnDocumentComplete(LPDISPATCH pDisp, VARIANT* URL)
@@ -410,6 +416,7 @@ void C剧情处理Dlg::OnBnClickedButton5()
 	m_res_file.EnableWindow(false);
 	m_res_file.SetCheck(false);
 	m_intro.ShowWindow(true);
+	m_issource.SetCheck(true);
 	m_url = TEXT("");
 	m_adddescription = TEXT("");
 	linenum = TEXT("字数:0");
@@ -477,4 +484,114 @@ void C剧情处理Dlg::OnEnChangeEdit3()
 void C剧情处理Dlg::OnStnClickedLinenum()
 {
 	// TODO: 在此添加控件通知处理程序代码
+}
+
+void C剧情处理Dlg::GetSourceCode(CString url) {
+	CString strResult;
+
+	// 初始化WinINet
+	HINTERNET hInternet = InternetOpen(
+		_T("MFC_FetchAgent"),  // 使用_T宏兼容Unicode
+		INTERNET_OPEN_TYPE_DIRECT,
+		NULL,
+		NULL,
+		0
+	);
+
+	if (!hInternet) {
+		MessageBox(TEXT("打开网页失败"));
+		return; // 返回空字符串表示失败
+	}
+
+	// 设置请求标志
+	DWORD dwFlags =
+		INTERNET_FLAG_RELOAD |
+		INTERNET_FLAG_NO_CACHE_WRITE;
+
+	// 自动识别HTTPS
+	if (url.Left(8) == _T("https://")) {
+		dwFlags |= INTERNET_FLAG_SECURE;
+	}
+
+	// 打开URL连接（使用T2CW转换字符串）
+	HINTERNET hUrl = InternetOpenUrl(
+		hInternet,
+		url,
+		NULL,           // 无额外HTTP头
+		0,              // 头长度
+		dwFlags,
+		0
+	);
+
+	if (!hUrl) {
+		InternetCloseHandle(hInternet);
+		MessageBox(TEXT("打开网页失败"));
+		return;
+	}
+	// 读取数据到CString
+	std::string rawData;
+	char buffer[4096];
+	DWORD dwRead = 0;
+
+	while (InternetReadFile(hUrl, buffer, sizeof(buffer), &dwRead) && dwRead > 0) {
+		rawData.append(buffer, dwRead);
+	}
+
+	// 清理资源
+	InternetCloseHandle(hUrl);
+	InternetCloseHandle(hInternet);
+	if (!rawData.empty()) {
+		int wideSize = MultiByteToWideChar(
+			CP_UTF8,          // 源编码为UTF-8
+			0,
+			rawData.data(),
+			rawData.size(),
+			NULL,
+			0
+		);
+
+		if (wideSize > 0) {
+			std::wstring wstr(wideSize, 0);
+			MultiByteToWideChar(
+				CP_UTF8,
+				0,
+				rawData.data(),
+				rawData.size(),
+				&wstr[0],
+				wideSize
+			);
+			strResult = wstr.c_str();
+		}
+	}
+	WriteCopyBoard(strResult);
+	CString a = TEXT("<textarea "), b = TEXT("</textarea");
+	int nStartA = strResult.Find(a);
+	if (nStartA == -1) {
+		MessageBox(TEXT("不存在可用的文本，请检查网页内容！"));
+		return;
+	}
+
+	// 计算实际截取起始位置（a之后）
+	int nStartPos = nStartA + a.GetLength();
+	if (nStartPos >= strResult.GetLength()) {
+		MessageBox(TEXT("不存在可用的文本，请检查网页内容！"));
+		return;
+	}
+
+	// 查找结束位置b（从nStartPos开始）
+	int nEndB = strResult.Find(b, nStartPos);
+	if (nEndB == -1) {
+		MessageBox(TEXT("不存在可用的文本，请检查网页内容！"));
+		return;
+	}
+	CString result = strResult.Mid(nStartPos, nEndB - nStartPos);
+	HANDLEER hand(result);
+	WriteCopyBoard(hand.afterhand);
+	CString sendmessage = m_url;
+	char len[10];
+	sprintf(len, "%d", hand.linenum);
+	sendmessage += len;
+	sendmessage += TEXT("\n剧情处理完成，已复制到剪贴板");
+	if (m_boxnotice.GetCheck()) MessageBox(sendmessage);
+	OnBnClickedButton5();
 }

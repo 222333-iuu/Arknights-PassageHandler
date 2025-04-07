@@ -65,4 +65,6 @@ public:
 	CStatic m_intro;
 	afx_msg void OnStnClickedLinenum();
 	CString linenum;
+	void C剧情处理Dlg::GetSourceCode(CString url);
+	CButton m_issource;
 };

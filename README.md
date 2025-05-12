@@ -1,3 +1,4 @@
+#注意，请前往https://github.com/222333-iuu/Arknights-PassageHandler-Ver250512来获取最新更新！！！
 # 剧情处理
 
 ## 1.获取标题
